@@ -6,9 +6,9 @@ For this project, I was tasked to create a reporting tool that prints out report
 
 ### Assignment
 The reporting tool needed to answer the following questions:
-1.) What are the most popular three articles of all time?
-2.) Who are the most popular article authors of all time?
-3.) On which days did more than 1% of requests lead to errors?
+1. What are the most popular three articles of all time?
+2. Who are the most popular article authors of all time?
+3. On which days did more than 1% of requests lead to errors?
 
 ### How to Run the Code
 This section will describe the SQL views I created for the code to function properly and how to run the program.
@@ -17,11 +17,13 @@ This section will describe the SQL views I created for the code to function prop
 This program uses four SQL views.
 
 **For Problem 2:**
+1.
 `CREATE VIEW articles_by_author AS
 SELECT title, name
 FROM articles, authors
 WHERE articles.author = authors.id;`
 
+2.
 `CREATE VIEW articles_by_view AS
 SELECT articles.title, COUNT(log.id) AS views
 FROM articles, log
@@ -30,6 +32,7 @@ GROUP BY articles.title
 ORDER BY views desc;`
 
 **For Problem 3:**
+1.
 `CREATE VIEW errors AS
 SELECT DATE(time) as day, CAST(COUNT(status) AS FLOAT) AS errors
 FROM log
@@ -37,6 +40,7 @@ WHERE NOT status='200 OK'
 GROUP BY day
 ORDER BY day;`
 
+2.
 `CREATE VIEW total AS
 SELECT DATE(time) AS day, CAST(COUNT(status) AS FLOAT) AS total
 FROM log
