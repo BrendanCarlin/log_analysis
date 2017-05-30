@@ -17,14 +17,13 @@ This section will describe the SQL views I created for the code to function prop
 This program uses four SQL views.
 
 **For Problem 2:**
-1.
-`CREATE VIEW articles_by_author AS
+
+> `CREATE VIEW articles_by_author AS
 SELECT title, name
 FROM articles, authors
 WHERE articles.author = authors.id;`
 
-2.
-`CREATE VIEW articles_by_view AS
+> `CREATE VIEW articles_by_view AS
 SELECT articles.title, COUNT(log.id) AS views
 FROM articles, log
 WHERE log.path LIKE CONCAT('%', articles.slug)
@@ -32,16 +31,15 @@ GROUP BY articles.title
 ORDER BY views desc;`
 
 **For Problem 3:**
-1.
-`CREATE VIEW errors AS
+
+>`CREATE VIEW errors AS
 SELECT DATE(time) as day, CAST(COUNT(status) AS FLOAT) AS errors
 FROM log
 WHERE NOT status='200 OK'
 GROUP BY day
 ORDER BY day;`
 
-2.
-`CREATE VIEW total AS
+>`CREATE VIEW total AS
 SELECT DATE(time) AS day, CAST(COUNT(status) AS FLOAT) AS total
 FROM log
 GROUP BY day
