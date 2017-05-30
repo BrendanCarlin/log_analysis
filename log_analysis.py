@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Log Analysis
 # Project 2
 # Udacity - Full Stack Nanodegree
@@ -42,49 +44,57 @@ GROUP BY day
 ORDER BY day;
 """
 
-# Display execution response
-print(" ")
-print("--- Generating Results ---")
-print(" ")
+# Store global database name
+DBNAME = 'news'
+
+
+def executeQuery(query):
+    """executeQuery takes a string as a parameter.  It executes the query
+    and returns the results as a list of tuples."""
+    try:
+        db = psycopg2.connect('dbname=' + DBNAME)
+        c = db.cursor()
+        c.execute(query)
+        rows = c.fetchall()
+        return rows
+        db.close()
+    except BaseException:
+        print("Unable to connect to the database")
+
 
 # Problem 1: What are the most popular three articles of all time?
-
-
 def top_three_articles():
     """Return the top three articles by most views"""
-    db = psycopg2.connect("dbname=news")
-    c = db.cursor()
     query = """SELECT title, COUNT(log.id) AS views
             FROM articles, log
             WHERE log.path LIKE CONCAT('%', articles.slug)
             GROUP BY articles.title ORDER BY views desc LIMIT 3;"""
-    c.execute(query)
-    rows = c.fetchall()
-    return rows
-    db.close()
+    top_three = executeQuery(query)
+    # Display header and results for Problem 1
+    print('**** Top Three Articles by Page View ****')
+    for i in top_three:
+        print('"' + i[0] + '" -- ' + str(i[1]) + " views")
+    print(" ")  # Display line break for legibility
+
 
 # Problem 2: Who are the most popular article authors of all time?
-
-
 def popular_authors():
     """Return the most popular authors based on overall page views"""
-    db = psycopg2.connect("dbname=news")
-    c = db.cursor()
     query = """SELECT name, sum(articles_by_view.views) AS views
             FROM articles_by_author, articles_by_view
             WHERE articles_by_author.title = articles_by_view.title
             GROUP BY name ORDER BY views desc;"""
-    c.execute(query)
-    rows = c.fetchall()
-    return rows
-    db.close()
+    author_popularity = executeQuery(query)
+    # Display header and results for Problem 2
+    print('**** Most Popular Authors Based on Total Article Views ****')
+    for i in author_popularity:
+        print(i[0] + ' -- ' + str(i[1]) + ' views')
+    print(' ')  # Display line break for legibility
+
 
 # Problem 3: On which days did more than 1% of requests lead to errors?
-
-
 def high_error_days():
-    db = psycopg2.connect("dbname=news")
-    c = db.cursor()
+    """Return the days where errors exceeded 1%"""
     query = """SELECT errors.day,
             ROUND(
             ((errors.errors/total.total) * 100)::DECIMAL, 2)::TEXT
@@ -93,32 +103,18 @@ def high_error_days():
             WHERE total.day = errors.day
             AND (((errors.errors/total.total) * 100) > 1.0)
             ORDER BY errors.day;"""
-    c.execute(query)
-    rows = c.fetchall()
-    return rows
-    db.close()
+    high_error_results = executeQuery(query)
+    # Display header and results for Problem 3
+    print('**** Days Where Errors Exceeded 1%' + ' of Total Views ****')
+    for i in high_error_results:
+        print(i[0].strftime('%B %d, %Y') + " -- " + i[1] + "%" + " errors")
+    print(' ')  # Display line break for legibility
 
 
-# Display header and results for Problem 1
-print('**** Top Three Articles by Page View ****')
-top_three = top_three_articles()
-for i in top_three:
-    print('"' + i[0] + '" -- ' + str(i[1]) + " views")
-
-print(" ")  # Display line break for legibility
-
-# Display header and results for Problem 2
-print('**** Most Popular Authors Based on Total Article Views ****')
-author_popularity = popular_authors()
-for i in author_popularity:
-    print(i[0] + ' -- ' + str(i[1]) + ' views')
-
-print(' ')  # Display line break for legibility
-
-# Display header and results for Problem 3
-print('**** Days Where Errors Exceeded 1%' + ' of Total Views ****')
-high_error_results = high_error_days()
-for i in high_error_results:
-    print(i[0].strftime('%B %d, %Y') + " -- " + i[1] + "%" + " errors")
-
-print(' ')  # Display line break for legibility
+if __name__ == '__main__':
+    print(" ")
+    print("--- Generating Results ---")
+    print(" ")
+    top_three_articles()
+    popular_authors()
+    high_error_days()
