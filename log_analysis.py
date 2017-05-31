@@ -25,7 +25,7 @@ WHERE articles.author = authors.id;
 CREATE VIEW articles_by_view AS
 SELECT articles.title, COUNT(log.id) AS views
 FROM articles, log
-WHERE log.path LIKE CONCAT('%', articles.slug)
+WHERE log.path = CONCAT('/article/', articles.slug)
 GROUP BY articles.title
 ORDER BY views desc;
 
@@ -56,8 +56,8 @@ def executeQuery(query):
         c = db.cursor()
         c.execute(query)
         rows = c.fetchall()
-        return rows
         db.close()
+        return rows
     except BaseException:
         print("Unable to connect to the database")
 
@@ -67,7 +67,7 @@ def top_three_articles():
     """Return the top three articles by most views"""
     query = """SELECT title, COUNT(log.id) AS views
             FROM articles, log
-            WHERE log.path LIKE CONCAT('%', articles.slug)
+            WHERE log.path = CONCAT('/article/', articles.slug)
             GROUP BY articles.title ORDER BY views desc LIMIT 3;"""
     top_three = executeQuery(query)
     # Display header and results for Problem 1

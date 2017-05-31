@@ -26,7 +26,7 @@ WHERE articles.author = authors.id;`
 > `CREATE VIEW articles_by_view AS
 SELECT articles.title, COUNT(log.id) AS views
 FROM articles, log
-WHERE log.path LIKE CONCAT('%', articles.slug)
+WHERE log.path = CONCAT('/articles/', articles.slug)
 GROUP BY articles.title
 ORDER BY views desc;`
 
